@@ -22,7 +22,7 @@ class LoginView(tk.Tk):
         self.controller = controller # Asigna el controlador
 
         # Configuración de la ventana principal
-        self.title("Login - Compensándote")
+        self.title("Login")
         self.ancho = 600
         self.alto = 580
         centrar_ventana(self, self.ancho, self.alto) # Configuración de tamaño y posición
@@ -90,7 +90,7 @@ class LoginView(tk.Tk):
         # Logo y subtitulo
         lbl_logo = tk.Label(
             left_header, 
-            text="🏢 Compensating you", 
+            text="BST Explorer", 
             font=("Segoe UI", 16, "bold"), 
             bg=self.COLOR_AZUL, 
             fg="#FFFFFF"
@@ -99,7 +99,7 @@ class LoginView(tk.Tk):
 
         lbl_subtitulo_header = tk.Label(
             left_header, 
-            text="Customer Management System", 
+            text="Binary Search Tree - Phase 4", 
             font=("Segoe UI", 10, "italic"), 
             bg=self.COLOR_AZUL, 
             fg="#FFFFFF"
@@ -107,6 +107,7 @@ class LoginView(tk.Tk):
         lbl_subtitulo_header.pack(anchor="w", pady=(2, 0))
 
         # Slogan
+        """
         lbl_slogan = tk.Label(
             header_frame, 
             text="Family Compensation,\nAffiliation Control", 
@@ -115,7 +116,7 @@ class LoginView(tk.Tk):
             fg="#FFFFFF",
             justify="right"
         )
-        lbl_slogan.pack(side="right")
+        lbl_slogan.pack(side="right")"""
 
         # contenedor principal (card)
         card_frame = ttk.Frame(self, style="Card.TFrame", padding=25)
@@ -163,7 +164,7 @@ class LoginView(tk.Tk):
 
         lbl_indicacion_sub = tk.Label(
             card_frame, 
-            text="The password is masked (***).", 
+            text="The password is masked (---).", 
             font=("Segoe UI", 9), 
             bg="#FFFFFF", 
             fg="#64748B"
