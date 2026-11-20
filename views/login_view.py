@@ -106,18 +106,6 @@ class LoginView(tk.Tk):
         )
         lbl_subtitulo_header.pack(anchor="center", pady=(2, 0))
 
-        # Slogan
-        """
-        lbl_slogan = tk.Label(
-            header_frame, 
-            text="Family Compensation,\nAffiliation Control", 
-            font=("Segoe UI", 9, "italic"), 
-            bg=self.COLOR_AZUL, 
-            fg="#FFFFFF",
-            justify="right"
-        )
-        lbl_slogan.pack(side="right")"""
-
         # contenedor principal (card)
         card_frame = ttk.Frame(self, style="Card.TFrame", padding=25)
         card_frame.pack(fill="both", expand=True, padx=35, pady=25)

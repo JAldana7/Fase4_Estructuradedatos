@@ -1,17 +1,11 @@
-"""
-Author: Johan David Aldana Castillo
-Date: 2026-11-20
-Description: Main graphical user interface for the Binary Search Tree Explorer.
-"""
-
+#importaciones necesarias para la interfaz grafica
 import tkinter as tk
 from tkinter import messagebox
 
-
+# clase principal de la vista que maneja la interfaz grafica
 class MainView:
-    """Main window for interactive Binary Search Tree visualization."""
 
-    # Exact Color Palette from LoginView
+    #diccionario de colores para la interfaz grafica
     COLOR_AZUL = "#00B4D8"
     COLOR_AZUL_HOVER = "#0284C7"
     COLOR_ROJO = "#DC2626"
@@ -27,12 +21,13 @@ class MainView:
     COLOR_NARANJA = "#F59E0B"
     COLOR_NARANJA_HOVER = "#D97706"
 
-    # Node Colors
+    # colores para los nodos del arbol binario
     NODE_REGULAR = "#00B4D8"
     NODE_FOUND = "#10B981"
     NODE_PATH = "#F59E0B"
     NODE_TRAVERSAL = "#F59E0B"
 
+    # Inicializa la vista principal con la ventana raíz y configura la interfaz de usuario.
     def __init__(self, root: tk.Tk):
         self.root = root
         self.root.title("Fase4JohanAldana — BST Explorer")
@@ -40,26 +35,25 @@ class MainView:
         self.root.minsize(1100, 680)
         self.root.configure(bg=self.COLOR_FONDO)
 
-        # Maximize window upon startup
+        # Maximizar ventana al iniciar
         try:
             self.root.state("zoomed")
         except tk.TclError:
             self.root.attributes("-zoomed", True)
 
-        # Intercept window close button (X) to ask confirmation
+        # Configurar el cierre de la ventana principal
         self.root.protocol("WM_DELETE_WINDOW", self._on_exit_click)
 
         self.controller = None
         self._build_ui()
 
+    # Asigna el controlador a la vista y actualiza la interfaz.
     def set_controller(self, controller):
-        """Binds the MainController instance to this view."""
         self.controller = controller
         self.refresh_all()
 
+    # Construye la interfaz de usuario principal, incluyendo el encabezado, barra de estado, panel lateral y área de trabajo.
     def _build_ui(self):
-        """Constructs the main window layout and widgets."""
-        # Top Header Bar (matches LoginView banner)
         header = tk.Frame(self.root, bg=self.COLOR_AZUL, height=52)
         header.pack(fill=tk.X, side=tk.TOP)
         header.pack_propagate(False)
@@ -120,8 +114,8 @@ class MainView:
 
         self._build_workspace(workspace)
 
+    # construye la barra lateral izquierda con controles, estadísticas del árbol y leyenda de colores.
     def _build_sidebar(self, parent: tk.Frame):
-        """Builds controls, tree statistics, and color legend inside the left panel."""
         tk.Label(
             parent,
             text="⚙  Controls",
@@ -253,9 +247,8 @@ class MainView:
             dot.pack(side=tk.LEFT, padx=(0, 8))
             tk.Label(row, text=label_text, font=("Segoe UI", 9), fg=self.COLOR_TEXT_MUTED, bg=self.COLOR_CARD).pack(side=tk.LEFT)
 
+    # construye el panel de trabajo principal con el lienzo del árbol y los tres lienzos de recorrido.
     def _build_workspace(self, parent: tk.Frame):
-        """Builds the main tree panel and the three traversal panels."""
-        # Panel 1: Main BST Canvas
         tree_container = tk.Frame(
             parent, bg=self.COLOR_CARD, highlightbackground=self.COLOR_BORDER, highlightthickness=1
         )
@@ -285,8 +278,8 @@ class MainView:
         self.inorder_canvas = self._create_traversal_panel(traversals_row, "In-order", padx=7)
         self.postorder_canvas = self._create_traversal_panel(traversals_row, "Post-order", padx=(7, 0))
 
+    # panel auxiliar para construir cada panel de recorrido (Pre-order, In-order, Post-order).
     def _create_traversal_panel(self, parent: tk.Frame, title: str, padx) -> tk.Canvas:
-        """Helper to construct each traversal panel (Pre-order, In-order, Post-order)."""
         panel = tk.Frame(parent, bg=self.COLOR_CARD, highlightbackground=self.COLOR_BORDER, highlightthickness=1)
         panel.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=padx)
 
@@ -305,8 +298,7 @@ class MainView:
         canvas.pack(fill=tk.BOTH, expand=True)
         return canvas
 
-    # --- Button Handlers ---
-
+    # botones de accion para agregar, buscar, limpiar y salir del arbol binario ----
     def _on_add_click(self):
         if self.controller:
             self.controller.handle_add_node(self.value_entry.get())
@@ -323,42 +315,42 @@ class MainView:
         if self.controller:
             self.controller.handle_exit()
 
-    # --- UI State & Dialog Methods ---
+    # ---
 
+    # Cierra la ventana principal.
     def destroy(self):
-        """Closes the main window."""
         self.root.destroy()
 
+    # Limpia el campo de entrada y establece el foco en él.
     def clear_input(self):
-        """Clears the text entry and focuses it."""
         self.value_entry.delete(0, tk.END)
         self.value_entry.focus_set()
 
+    # Establece el mensaje de estado en la barra inferior, con opción de error o éxito.
     def set_status(self, message: str, is_error: bool = False):
-        """Updates the bottom status bar text."""
         color = self.COLOR_ROJO if is_error else self.COLOR_VERDE
         self.status_label.config(text=message, fg=color)
 
+    # Muestra un cuadro de diálogo de error con el título y mensaje proporcionados.
     def show_error(self, title: str, message: str):
-        """Displays an error popup dialog."""
         messagebox.showerror(title, message, parent=self.root)
 
+    # Muestra un cuadro de diálogo de información con el título y mensaje proporcionados.
     def show_info(self, title: str, message: str):
-        """Displays an information popup dialog."""
         messagebox.showinfo(title, message, parent=self.root)
 
+    # Muestra un cuadro de diálogo de advertencia con el título y mensaje proporcionados.
     def ask_confirmation(self, title: str, message: str) -> bool:
-        """Displays a Yes/No confirmation dialog."""
         return messagebox.askyesno(title, message, parent=self.root)
 
+    # Actualiza las estadísticas del árbol (número de nodos, altura y valor de la raíz) en la barra lateral.
     def update_statistics(self, count: int, height: int, root_val: int | None):
-        """Updates the Tree Statistics labels in the sidebar."""
         self.nodes_stat_label.config(text=f"Nodes:   {count}")
         self.height_stat_label.config(text=f"Height:  {height}")
         self.root_stat_label.config(text=f"Root:    {root_val if root_val is not None else '—'}")
 
+    # Refresca toda la interfaz, incluyendo el árbol y los recorridos, con la opción de resaltar un camino y un valor encontrado.
     def refresh_all(self, highlight_path: list[int] | None = None, found_value: int | None = None):
-        """Redraws the tree, traversals, and statistics."""
         if not self.controller:
             return
 
@@ -371,8 +363,8 @@ class MainView:
         self.draw_traversal(self.inorder_canvas, bst.get_inorder(), "No In-order data")
         self.draw_traversal(self.postorder_canvas, bst.get_postorder(), "No Post-order data")
 
+    # Dibuja el árbol binario en el lienzo, resaltando un camino específico y un valor encontrado si se proporcionan.
     def draw_tree(self, root, highlight_path: list[int], found_value: int | None):
-        """Renders the BST graphically on the main canvas."""
         self.tree_canvas.delete("all")
         self.tree_canvas.update_idletasks()
 
@@ -406,8 +398,8 @@ class MainView:
             found_value=found_value
         )
 
+    # Dibuja recursivamente un subárbol en el lienzo, conectando nodos y resaltando el camino y el valor encontrado según corresponda.
     def _draw_subtree(self, node, x: int, y: int, x_offset: int, y_gap: int, highlight_path: list[int], found_value: int | None):
-        """Recursively draws edges first and nodes on top."""
         if node is None:
             return
 
@@ -415,7 +407,7 @@ class MainView:
         child_y = y + y_gap
         next_offset = max(36, x_offset // 2)
 
-        # Draw edges to children
+        # si el nodo tiene hijos, dibuja las líneas de conexión y llama recursivamente a la función para los subárboles izquierdo y derecho.
         if node.left is not None:
             left_x = x - x_offset
             edge_color = self.NODE_PATH if (node.value in highlight_path and node.left.value in highlight_path) else self.COLOR_TEXT_MUTED
@@ -428,7 +420,7 @@ class MainView:
             self.tree_canvas.create_line(x, y, right_x, child_y, fill=edge_color, width=2.2)
             self._draw_subtree(node.right, right_x, child_y, next_offset, y_gap, highlight_path, found_value)
 
-        # Determine node fill color
+        # Determina el color de relleno y contorno del nodo según si es el valor encontrado, parte del camino resaltado o un nodo regular.
         if found_value is not None and node.value == found_value:
             fill_color = self.NODE_FOUND
             outline_color = "#047857"
@@ -439,7 +431,7 @@ class MainView:
             fill_color = self.NODE_REGULAR
             outline_color = self.COLOR_AZUL_HOVER
 
-        # Draw node circle and value
+        # Dibuja el nodo como un círculo con el valor del nodo centrado dentro.
         self.tree_canvas.create_oval(
             x - radius, y - radius, x + radius, y + radius,
             fill=fill_color, outline=outline_color, width=2
@@ -451,8 +443,8 @@ class MainView:
             font=("Segoe UI", 10, "bold")
         )
 
+    # Dibuja un recorrido (Pre-order, In-order, Post-order) en el lienzo correspondiente, mostrando los valores en círculos conectados por flechas.
     def draw_traversal(self, canvas: tk.Canvas, values: list[int], empty_text: str):
-        """Renders horizontal sequence of traversal nodes connected by arrows."""
         canvas.delete("all")
         canvas.update_idletasks()
 
