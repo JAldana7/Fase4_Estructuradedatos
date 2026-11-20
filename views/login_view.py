@@ -181,7 +181,7 @@ class LoginView(tk.Tk):
         self.txt_password = tk.Entry(
             input_container, 
             font=("Segoe UI", 11), 
-            show="*", 
+            show="-", 
             bg="#F8FAFC", 
             bd=0, 
             relief="flat"
