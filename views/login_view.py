@@ -22,7 +22,7 @@ class LoginView(tk.Tk):
         self.controller = controller # Asigna el controlador
 
         # Configuración de la ventana principal
-        self.title("Login")
+        self.title("Fase4JohanAldana — Login")
         self.ancho = 600
         self.alto = 580
         centrar_ventana(self, self.ancho, self.alto) # Configuración de tamaño y posición
@@ -85,17 +85,17 @@ class LoginView(tk.Tk):
         header_frame = ttk.Frame(self, style="Header.TFrame", padding=(25, 20))
         header_frame.pack(fill="x", side="top")
         left_header = tk.Frame(header_frame, bg=self.COLOR_AZUL)
-        left_header.pack(side="left")
+        left_header.pack(expand=True)
 
         # Logo y subtitulo
         lbl_logo = tk.Label(
             left_header, 
             text="BST Explorer", 
-            font=("Segoe UI", 16, "bold"), 
+            font=("Segoe UI", 18, "bold"), 
             bg=self.COLOR_AZUL, 
             fg="#FFFFFF"
         )
-        lbl_logo.pack(anchor="w")
+        lbl_logo.pack(anchor="center")
 
         lbl_subtitulo_header = tk.Label(
             left_header, 
@@ -104,7 +104,7 @@ class LoginView(tk.Tk):
             bg=self.COLOR_AZUL, 
             fg="#FFFFFF"
         )
-        lbl_subtitulo_header.pack(anchor="w", pady=(2, 0))
+        lbl_subtitulo_header.pack(anchor="center", pady=(2, 0))
 
         # Slogan
         """
@@ -259,7 +259,7 @@ class LoginView(tk.Tk):
     #funcion para alternar la visibilidad de la contraseña
     def _toggle_password_visibility(self):
         if self._password_visible:
-            self.txt_password.config(show="*")
+            self.txt_password.config(show="-")
             self._password_visible = False
         else:
             self.txt_password.config(show="")

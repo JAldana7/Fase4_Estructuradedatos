@@ -98,12 +98,26 @@ class MainController:
             )
 
     def handle_clear_tree(self):
-        """Clears the entire tree and resets all panels."""
-        self.bst.clear()
-        self.view.clear_input()
-        self.view.refresh_all()
-        self.view.set_status("Tree cleared successfully.")
+        """Asks for confirmation before clearing the entire tree and resetting all panels."""
+        if self.bst.root is None:
+            self.view.set_status("Tree is already empty.")
+            return
+
+        confirmed = self.view.ask_confirmation(
+            "Confirm Clear Tree",
+            "Are you sure you want to clear the entire Binary Search Tree?\nThis action cannot be undone."
+        )
+        if confirmed:
+            self.bst.clear()
+            self.view.clear_input()
+            self.view.refresh_all()
+            self.view.set_status("Tree cleared successfully.")
 
     def handle_exit(self):
-        """Closes the application."""
-        self.view.destroy()
+        """Asks for confirmation before closing the application."""
+        confirmed = self.view.ask_confirmation(
+            "Confirm Exit",
+            "Are you sure you want to exit the BST Explorer application?"
+        )
+        if confirmed:
+            self.view.destroy()

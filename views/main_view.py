@@ -11,30 +11,43 @@ from tkinter import messagebox
 class MainView:
     """Main window for interactive Binary Search Tree visualization."""
 
-    # Color Palette
-    BG_DARK = "#0b192c"
-    BG_PANEL = "#0f233c"
-    BG_HEADER = "#08121e"
-    BORDER_CYAN = "#1e4976"
-    ACCENT_CYAN = "#00b4d8"
-    ACCENT_GREEN = "#10b981"
-    ACCENT_ORANGE = "#f59e0b"
-    ACCENT_RED = "#ef4444"
-    TEXT_PRIMARY = "#f8fafc"
-    TEXT_MUTED = "#94a3b8"
+    # Exact Color Palette from LoginView
+    COLOR_AZUL = "#00B4D8"
+    COLOR_AZUL_HOVER = "#0284C7"
+    COLOR_ROJO = "#DC2626"
+    COLOR_ROJO_HOVER = "#B91C1C"
+    COLOR_FONDO = "#F4F6F8"
+    COLOR_CARD = "#FFFFFF"
+    COLOR_INPUT_BG = "#F8FAFC"
+    COLOR_BORDER = "#CBD5E1"
+    COLOR_TEXT_DARK = "#0F172A"
+    COLOR_TEXT_MUTED = "#64748B"
+    COLOR_VERDE = "#10B981"
+    COLOR_VERDE_HOVER = "#059669"
+    COLOR_NARANJA = "#F59E0B"
+    COLOR_NARANJA_HOVER = "#D97706"
 
     # Node Colors
-    NODE_REGULAR = "#00b4d8"
-    NODE_FOUND = "#10b981"
-    NODE_PATH = "#f59e0b"
-    NODE_TRAVERSAL = "#f59e0b"
+    NODE_REGULAR = "#00B4D8"
+    NODE_FOUND = "#10B981"
+    NODE_PATH = "#F59E0B"
+    NODE_TRAVERSAL = "#F59E0B"
 
     def __init__(self, root: tk.Tk):
         self.root = root
         self.root.title("Fase4JohanAldana — BST Explorer")
         self.root.geometry("1280x740")
         self.root.minsize(1100, 680)
-        self.root.configure(bg=self.BG_DARK)
+        self.root.configure(bg=self.COLOR_FONDO)
+
+        # Maximize window upon startup
+        try:
+            self.root.state("zoomed")
+        except tk.TclError:
+            self.root.attributes("-zoomed", True)
+
+        # Intercept window close button (X) to ask confirmation
+        self.root.protocol("WM_DELETE_WINDOW", self._on_exit_click)
 
         self.controller = None
         self._build_ui()
@@ -46,34 +59,31 @@ class MainView:
 
     def _build_ui(self):
         """Constructs the main window layout and widgets."""
-        # Top Header Bar
-        header = tk.Frame(
-            self.root, bg=self.BG_HEADER, height=44,
-            highlightbackground=self.BORDER_CYAN, highlightthickness=1
-        )
+        # Top Header Bar (matches LoginView banner)
+        header = tk.Frame(self.root, bg=self.COLOR_AZUL, height=52)
         header.pack(fill=tk.X, side=tk.TOP)
         header.pack_propagate(False)
 
         tk.Label(
             header,
             text="🌲  BST Explorer  —  Binary Search Tree",
-            font=("Segoe UI", 12, "bold"),
-            fg=self.ACCENT_CYAN,
-            bg=self.BG_HEADER
-        ).pack(side=tk.LEFT, padx=16)
+            font=("Segoe UI", 14, "bold"),
+            fg="#FFFFFF",
+            bg=self.COLOR_AZUL
+        ).pack(side=tk.LEFT, padx=20)
 
         tk.Label(
             header,
-            text="Johan David Aldana Castillo  |  Data Structures 301305",
-            font=("Segoe UI", 9),
-            fg=self.TEXT_MUTED,
-            bg=self.BG_HEADER
-        ).pack(side=tk.RIGHT, padx=16)
+            text="Johan David Aldana Castillo  |  Data Structures · Code: 301305 · ECBTI",
+            font=("Segoe UI", 9, "bold"),
+            fg="#FFFFFF",
+            bg=self.COLOR_AZUL
+        ).pack(side=tk.RIGHT, padx=20)
 
         # Bottom Status Bar
         status_frame = tk.Frame(
-            self.root, bg=self.BG_HEADER, height=28,
-            highlightbackground=self.BORDER_CYAN, highlightthickness=1
+            self.root, bg=self.COLOR_CARD, height=30,
+            highlightbackground=self.COLOR_BORDER, highlightthickness=1
         )
         status_frame.pack(fill=tk.X, side=tk.BOTTOM)
         status_frame.pack_propagate(False)
@@ -81,31 +91,31 @@ class MainView:
         self.status_label = tk.Label(
             status_frame,
             text="Ready. Enter an integer value to build the Binary Search Tree.",
-            font=("Segoe UI", 9),
-            fg=self.ACCENT_GREEN,
-            bg=self.BG_HEADER
+            font=("Segoe UI", 9, "bold"),
+            fg=self.COLOR_VERDE,
+            bg=self.COLOR_CARD
         )
-        self.status_label.pack(side=tk.LEFT, padx=14)
+        self.status_label.pack(side=tk.LEFT, padx=16)
 
         # Main Body Container
-        body = tk.Frame(self.root, bg=self.BG_DARK)
-        body.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        body = tk.Frame(self.root, bg=self.COLOR_FONDO)
+        body.pack(fill=tk.BOTH, expand=True, padx=14, pady=14)
 
         # Left Sidebar (Controls, Statistics, Legend)
         sidebar = tk.Frame(
             body,
-            bg=self.BG_PANEL,
-            width=210,
-            highlightbackground=self.BORDER_CYAN,
+            bg=self.COLOR_CARD,
+            width=225,
+            highlightbackground=self.COLOR_BORDER,
             highlightthickness=1
         )
-        sidebar.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 10))
+        sidebar.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 14))
         sidebar.pack_propagate(False)
 
         self._build_sidebar(sidebar)
 
         # Right Workspace (Tree Canvas + 3 Traversal Canvases)
-        workspace = tk.Frame(body, bg=self.BG_DARK)
+        workspace = tk.Frame(body, bg=self.COLOR_FONDO)
         workspace.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
         self._build_workspace(workspace)
@@ -116,32 +126,32 @@ class MainView:
             parent,
             text="⚙  Controls",
             font=("Segoe UI", 12, "bold"),
-            fg=self.ACCENT_CYAN,
-            bg=self.BG_PANEL
-        ).pack(anchor="w", padx=14, pady=(14, 8))
+            fg=self.COLOR_TEXT_DARK,
+            bg=self.COLOR_CARD
+        ).pack(anchor="w", padx=16, pady=(16, 8))
 
-        tk.Frame(parent, bg=self.BORDER_CYAN, height=1).pack(fill=tk.X, padx=10, pady=(0, 10))
+        tk.Frame(parent, bg=self.COLOR_BORDER, height=1).pack(fill=tk.X, padx=14, pady=(0, 12))
 
         tk.Label(
             parent,
             text="Node Value (Integer):",
-            font=("Segoe UI", 9),
-            fg=self.TEXT_MUTED,
-            bg=self.BG_PANEL
-        ).pack(anchor="w", padx=14, pady=(0, 4))
+            font=("Segoe UI", 9, "bold"),
+            fg=self.COLOR_TEXT_MUTED,
+            bg=self.COLOR_CARD
+        ).pack(anchor="w", padx=16, pady=(0, 4))
 
         self.value_entry = tk.Entry(
             parent,
             font=("Segoe UI", 12, "bold"),
-            bg=self.BG_DARK,
-            fg=self.TEXT_PRIMARY,
-            insertbackground=self.ACCENT_CYAN,
+            bg=self.COLOR_INPUT_BG,
+            fg=self.COLOR_TEXT_DARK,
+            insertbackground=self.COLOR_AZUL,
             justify="center",
             relief=tk.FLAT,
-            highlightbackground=self.BORDER_CYAN,
+            highlightbackground=self.COLOR_BORDER,
             highlightthickness=1
         )
-        self.value_entry.pack(fill=tk.X, padx=14, pady=(0, 12), ipady=6)
+        self.value_entry.pack(fill=tk.X, padx=16, pady=(0, 12), ipady=6)
         self.value_entry.bind("<Return>", lambda event: self._on_add_click())
         self.value_entry.focus_set()
 
@@ -151,79 +161,83 @@ class MainView:
         tk.Button(
             parent,
             text="+  Add Node",
-            bg=self.ACCENT_CYAN,
-            fg="#041524",
-            activebackground="#0096c7",
+            bg=self.COLOR_AZUL,
+            fg="#FFFFFF",
+            activebackground=self.COLOR_AZUL_HOVER,
+            activeforeground="#FFFFFF",
             command=self._on_add_click,
             **btn_style
-        ).pack(fill=tk.X, padx=14, pady=4, ipady=6)
+        ).pack(fill=tk.X, padx=16, pady=4, ipady=6)
 
         tk.Button(
             parent,
             text="🔍  Search Node",
-            bg=self.ACCENT_GREEN,
-            fg="#041524",
-            activebackground="#059669",
+            bg=self.COLOR_VERDE,
+            fg="#FFFFFF",
+            activebackground=self.COLOR_VERDE_HOVER,
+            activeforeground="#FFFFFF",
             command=self._on_search_click,
             **btn_style
-        ).pack(fill=tk.X, padx=14, pady=4, ipady=6)
+        ).pack(fill=tk.X, padx=16, pady=4, ipady=6)
 
         tk.Button(
             parent,
             text="🗑  Clear Tree",
-            bg=self.ACCENT_ORANGE,
-            fg="#041524",
-            activebackground="#d97706",
+            bg=self.COLOR_NARANJA,
+            fg="#FFFFFF",
+            activebackground=self.COLOR_NARANJA_HOVER,
+            activeforeground="#FFFFFF",
             command=self._on_clear_click,
             **btn_style
-        ).pack(fill=tk.X, padx=14, pady=4, ipady=6)
+        ).pack(fill=tk.X, padx=16, pady=4, ipady=6)
 
         tk.Button(
             parent,
             text="🚪  Exit",
-            bg=self.ACCENT_RED,
-            fg="#ffffff",
-            activebackground="#dc2626",
+            bg=self.COLOR_ROJO,
+            fg="#FFFFFF",
+            activebackground=self.COLOR_ROJO_HOVER,
+            activeforeground="#FFFFFF",
             command=self._on_exit_click,
             **btn_style
-        ).pack(fill=tk.X, padx=14, pady=4, ipady=6)
+        ).pack(fill=tk.X, padx=16, pady=4, ipady=6)
 
-        tk.Frame(parent, bg=self.BORDER_CYAN, height=1).pack(fill=tk.X, padx=10, pady=14)
+        tk.Frame(parent, bg=self.COLOR_BORDER, height=1).pack(fill=tk.X, padx=14, pady=14)
 
         # Tree Statistics
         tk.Label(
             parent,
             text="Tree Statistics",
             font=("Segoe UI", 10, "bold"),
-            fg=self.TEXT_PRIMARY,
-            bg=self.BG_PANEL
-        ).pack(anchor="w", padx=14, pady=(0, 6))
+            fg=self.COLOR_TEXT_DARK,
+            bg=self.COLOR_CARD
+        ).pack(anchor="w", padx=16, pady=(0, 6))
 
         self.nodes_stat_label = tk.Label(
-            parent, text="Nodes:   0", font=("Consolas", 10), fg=self.TEXT_MUTED, bg=self.BG_PANEL
+            parent, text="Nodes:   0", font=("Consolas", 10, "bold"), fg=self.COLOR_TEXT_MUTED, bg=self.COLOR_CARD
         )
-        self.nodes_stat_label.pack(anchor="w", padx=18, pady=2)
+        self.nodes_stat_label.pack(anchor="w", padx=20, pady=2)
 
         self.height_stat_label = tk.Label(
-            parent, text="Height:  0", font=("Consolas", 10), fg=self.TEXT_MUTED, bg=self.BG_PANEL
+            parent, text="Height:  0", font=("Consolas", 10, "bold"), fg=self.COLOR_TEXT_MUTED, bg=self.COLOR_CARD
         )
-        self.height_stat_label.pack(anchor="w", padx=18, pady=2)
+        self.height_stat_label.pack(anchor="w", padx=20, pady=2)
 
         self.root_stat_label = tk.Label(
-            parent, text="Root:    —", font=("Consolas", 10), fg=self.TEXT_MUTED, bg=self.BG_PANEL
+            parent, text="Root:    —", font=("Consolas", 10, "bold"), fg=self.COLOR_TEXT_MUTED, bg=self.COLOR_CARD
         )
-        self.root_stat_label.pack(anchor="w", padx=18, pady=2)
+        self.root_stat_label.pack(anchor="w", padx=20, pady=2)
 
-        tk.Frame(parent, bg=self.BORDER_CYAN, height=1).pack(fill=tk.X, padx=10, pady=14)
+        tk.Frame(parent, bg=self.COLOR_BORDER, height=1).pack(fill=tk.X, padx=14, pady=14)
 
         # Legend
         tk.Label(
             parent,
             text="Legend",
             font=("Segoe UI", 10, "bold"),
-            fg=self.TEXT_PRIMARY,
-            bg=self.BG_PANEL
-        ).pack(anchor="w", padx=14, pady=(0, 6))
+            fg=self.COLOR_TEXT_DARK,
+            bg=self.COLOR_CARD
+        ).pack(anchor="w", padx=16, pady=(0, 6))
 
         legend_items = [
             (self.NODE_REGULAR, "Regular node"),
@@ -232,62 +246,62 @@ class MainView:
             (self.NODE_TRAVERSAL, "Traversal node"),
         ]
         for color, label_text in legend_items:
-            row = tk.Frame(parent, bg=self.BG_PANEL)
-            row.pack(anchor="w", padx=18, pady=3)
-            dot = tk.Canvas(row, width=12, height=12, bg=self.BG_PANEL, highlightthickness=0)
+            row = tk.Frame(parent, bg=self.COLOR_CARD)
+            row.pack(anchor="w", padx=20, pady=3)
+            dot = tk.Canvas(row, width=12, height=12, bg=self.COLOR_CARD, highlightthickness=0)
             dot.create_oval(2, 2, 10, 10, fill=color, outline="")
             dot.pack(side=tk.LEFT, padx=(0, 8))
-            tk.Label(row, text=label_text, font=("Segoe UI", 9), fg=self.TEXT_MUTED, bg=self.BG_PANEL).pack(side=tk.LEFT)
+            tk.Label(row, text=label_text, font=("Segoe UI", 9), fg=self.COLOR_TEXT_MUTED, bg=self.COLOR_CARD).pack(side=tk.LEFT)
 
     def _build_workspace(self, parent: tk.Frame):
         """Builds the main tree panel and the three traversal panels."""
         # Panel 1: Main BST Canvas
         tree_container = tk.Frame(
-            parent, bg=self.BG_PANEL, highlightbackground=self.BORDER_CYAN, highlightthickness=1
+            parent, bg=self.COLOR_CARD, highlightbackground=self.COLOR_BORDER, highlightthickness=1
         )
-        tree_container.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+        tree_container.pack(fill=tk.BOTH, expand=True, pady=(0, 14))
 
-        tree_header = tk.Frame(tree_container, bg=self.BG_HEADER, height=30)
+        tree_header = tk.Frame(tree_container, bg=self.COLOR_TEXT_DARK, height=34)
         tree_header.pack(fill=tk.X)
         tree_header.pack_propagate(False)
         tk.Label(
             tree_header,
             text="🌳  BST Tree  (max 4 levels)",
             font=("Segoe UI", 9, "bold"),
-            fg=self.ACCENT_CYAN,
-            bg=self.BG_HEADER
-        ).pack(side=tk.LEFT, padx=10)
+            fg="#FFFFFF",
+            bg=self.COLOR_TEXT_DARK
+        ).pack(side=tk.LEFT, padx=14)
 
-        self.tree_canvas = tk.Canvas(tree_container, bg=self.BG_DARK, highlightthickness=0)
+        self.tree_canvas = tk.Canvas(tree_container, bg=self.COLOR_INPUT_BG, highlightthickness=0)
         self.tree_canvas.pack(fill=tk.BOTH, expand=True)
         self.tree_canvas.bind("<Configure>", lambda event: self.refresh_all())
 
         # Bottom Row: 3 Traversal Canvases
-        traversals_row = tk.Frame(parent, bg=self.BG_DARK, height=125)
+        traversals_row = tk.Frame(parent, bg=self.COLOR_FONDO, height=135)
         traversals_row.pack(fill=tk.X)
         traversals_row.pack_propagate(False)
 
-        self.preorder_canvas = self._create_traversal_panel(traversals_row, "Pre-order", padx=(0, 5))
-        self.inorder_canvas = self._create_traversal_panel(traversals_row, "In-order", padx=5)
-        self.postorder_canvas = self._create_traversal_panel(traversals_row, "Post-order", padx=(5, 0))
+        self.preorder_canvas = self._create_traversal_panel(traversals_row, "Pre-order", padx=(0, 7))
+        self.inorder_canvas = self._create_traversal_panel(traversals_row, "In-order", padx=7)
+        self.postorder_canvas = self._create_traversal_panel(traversals_row, "Post-order", padx=(7, 0))
 
     def _create_traversal_panel(self, parent: tk.Frame, title: str, padx) -> tk.Canvas:
         """Helper to construct each traversal panel (Pre-order, In-order, Post-order)."""
-        panel = tk.Frame(parent, bg=self.BG_PANEL, highlightbackground=self.BORDER_CYAN, highlightthickness=1)
+        panel = tk.Frame(parent, bg=self.COLOR_CARD, highlightbackground=self.COLOR_BORDER, highlightthickness=1)
         panel.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=padx)
 
-        header = tk.Frame(panel, bg=self.BG_HEADER, height=28)
+        header = tk.Frame(panel, bg=self.COLOR_TEXT_DARK, height=30)
         header.pack(fill=tk.X)
         header.pack_propagate(False)
         tk.Label(
             header,
             text=f"•  {title}",
             font=("Segoe UI", 9, "bold"),
-            fg=self.ACCENT_CYAN,
-            bg=self.BG_HEADER
-        ).pack(side=tk.LEFT, padx=10)
+            fg="#FFFFFF",
+            bg=self.COLOR_TEXT_DARK
+        ).pack(side=tk.LEFT, padx=12)
 
-        canvas = tk.Canvas(panel, bg=self.BG_DARK, highlightthickness=0)
+        canvas = tk.Canvas(panel, bg=self.COLOR_INPUT_BG, highlightthickness=0)
         canvas.pack(fill=tk.BOTH, expand=True)
         return canvas
 
@@ -309,7 +323,7 @@ class MainView:
         if self.controller:
             self.controller.handle_exit()
 
-    # --- UI State & Drawing Methods ---
+    # --- UI State & Dialog Methods ---
 
     def destroy(self):
         """Closes the main window."""
@@ -322,7 +336,7 @@ class MainView:
 
     def set_status(self, message: str, is_error: bool = False):
         """Updates the bottom status bar text."""
-        color = self.ACCENT_RED if is_error else self.ACCENT_GREEN
+        color = self.COLOR_ROJO if is_error else self.COLOR_VERDE
         self.status_label.config(text=message, fg=color)
 
     def show_error(self, title: str, message: str):
@@ -332,6 +346,10 @@ class MainView:
     def show_info(self, title: str, message: str):
         """Displays an information popup dialog."""
         messagebox.showinfo(title, message, parent=self.root)
+
+    def ask_confirmation(self, title: str, message: str) -> bool:
+        """Displays a Yes/No confirmation dialog."""
+        return messagebox.askyesno(title, message, parent=self.root)
 
     def update_statistics(self, count: int, height: int, root_val: int | None):
         """Updates the Tree Statistics labels in the sidebar."""
@@ -369,13 +387,13 @@ class MainView:
                 width // 2,
                 height // 2,
                 text="Empty tree",
-                fill=self.TEXT_MUTED,
+                fill=self.COLOR_TEXT_MUTED,
                 font=("Segoe UI", 12)
             )
             return
 
         start_y = 55
-        vertical_gap = max(75, (height - 110) // 4)
+        vertical_gap = max(80, (height - 110) // 4)
         initial_offset = width // 4
 
         self._draw_subtree(
@@ -393,33 +411,33 @@ class MainView:
         if node is None:
             return
 
-        radius = 21
+        radius = 22
         child_y = y + y_gap
-        next_offset = max(32, x_offset // 2)
+        next_offset = max(36, x_offset // 2)
 
         # Draw edges to children
         if node.left is not None:
             left_x = x - x_offset
-            edge_color = self.NODE_PATH if (node.value in highlight_path and node.left.value in highlight_path) else "#cbd5e1"
-            self.tree_canvas.create_line(x, y, left_x, child_y, fill=edge_color, width=2)
+            edge_color = self.NODE_PATH if (node.value in highlight_path and node.left.value in highlight_path) else self.COLOR_TEXT_MUTED
+            self.tree_canvas.create_line(x, y, left_x, child_y, fill=edge_color, width=2.2)
             self._draw_subtree(node.left, left_x, child_y, next_offset, y_gap, highlight_path, found_value)
 
         if node.right is not None:
             right_x = x + x_offset
-            edge_color = self.NODE_PATH if (node.value in highlight_path and node.right.value in highlight_path) else "#cbd5e1"
-            self.tree_canvas.create_line(x, y, right_x, child_y, fill=edge_color, width=2)
+            edge_color = self.NODE_PATH if (node.value in highlight_path and node.right.value in highlight_path) else self.COLOR_TEXT_MUTED
+            self.tree_canvas.create_line(x, y, right_x, child_y, fill=edge_color, width=2.2)
             self._draw_subtree(node.right, right_x, child_y, next_offset, y_gap, highlight_path, found_value)
 
         # Determine node fill color
         if found_value is not None and node.value == found_value:
             fill_color = self.NODE_FOUND
-            outline_color = "#a7f3d0"
+            outline_color = "#047857"
         elif node.value in highlight_path:
             fill_color = self.NODE_PATH
-            outline_color = "#fde68a"
+            outline_color = "#B45309"
         else:
             fill_color = self.NODE_REGULAR
-            outline_color = "#bae6fd"
+            outline_color = self.COLOR_AZUL_HOVER
 
         # Draw node circle and value
         self.tree_canvas.create_oval(
@@ -429,7 +447,7 @@ class MainView:
         self.tree_canvas.create_text(
             x, y,
             text=str(node.value),
-            fill="#041524",
+            fill="#FFFFFF",
             font=("Segoe UI", 10, "bold")
         )
 
@@ -449,16 +467,16 @@ class MainView:
                 width // 2,
                 height // 2,
                 text=empty_text,
-                fill=self.TEXT_MUTED,
+                fill=self.COLOR_TEXT_MUTED,
                 font=("Segoe UI", 9)
             )
             return
 
         count = len(values)
-        margin_x = 22
+        margin_x = 24
         available_w = max(60, width - (margin_x * 2))
         step = available_w / max(1, count)
-        radius = min(13, max(9, int(step * 0.36)))
+        radius = min(14, max(10, int(step * 0.36)))
         center_y = height // 2
 
         coords = []
@@ -472,18 +490,18 @@ class MainView:
             x2, y2 = coords[i + 1]
             canvas.create_line(
                 x1 + radius, y1, x2 - radius, y2,
-                fill=self.TEXT_MUTED, width=1.5, arrow=tk.LAST, arrowshape=(6, 8, 3)
+                fill=self.COLOR_TEXT_MUTED, width=1.6, arrow=tk.LAST, arrowshape=(6, 8, 3)
             )
 
         # Draw traversal circles
         for (cx, cy), val in zip(coords, values):
             canvas.create_oval(
                 cx - radius, cy - radius, cx + radius, cy + radius,
-                fill=self.NODE_TRAVERSAL, outline="#fef3c7", width=1.5
+                fill=self.NODE_TRAVERSAL, outline="#B45309", width=1.5
             )
             canvas.create_text(
                 cx, cy,
                 text=str(val),
-                fill="#041524",
+                fill="#FFFFFF",
                 font=("Segoe UI", 8, "bold")
             )
